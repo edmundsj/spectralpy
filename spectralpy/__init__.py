@@ -1,2 +1,2 @@
-from spectralpy.source.some_module import SomeClass
-from spectralpy.test.shorthand import *
+from spectralpy.source.unit_parsing import *
+from spectralpy.source.spectral_processing import *
