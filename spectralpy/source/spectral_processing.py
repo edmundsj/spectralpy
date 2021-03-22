@@ -36,7 +36,7 @@ def power_spectrum(data, window='box', siding='single'):
         power_spectrum = power_spectrumNumpy(
             data, window_data, siding=siding)
     elif isinstance(data, pd.DataFrame):
-        power_spectrum = getPowerSpetrumPandas(
+        power_spectrum = power_spectrum_pandas(
             data, window_data=window_data, siding=siding)
     else:
         raise ValueError(f"Function not implemented for type {type(data)},"+
@@ -44,7 +44,7 @@ def power_spectrum(data, window='box', siding='single'):
 
     return power_spectrum
 
-def getPowerSpetrumPandas(data, window_data=1, siding='single'):
+def power_spectrum_pandas(data, window_data=1, siding='single'):
     """
     Implementation of powerSpectrum for a pandas DataFrame.
 
@@ -98,42 +98,3 @@ def power_spectrumNumpy(data, window_data, siding='single'):
         power_spectrum[0] /= 2
 
     return power_spectrum
-
-def powerSpectrumPlot(power_spectrum, sampling_frequency=None):
-    """
-    Plots a given power spectrum.
-
-    :param power_spectrum: Power spectrum pandas DataFrame with Frequency in the first column and power in the second column
-    :param sampling_frequency: Sampling frequency the data was taken at
-    :returns fig, ax: Figure, axes pair for power spectrum plot
-
-    """
-    if isinstance(power_spectrum, pd.DataFrame):
-        return powerSpectrumPlotPandas(power_spectrum)
-    else:
-        raise NotImplementedError("Power spectrum plot not implemented" +
-                                  f" for type {type(power_spectrum)}")
-
-def powerSpectrumPlotPandas(power_spectrum):
-    """
-    Implementation of powerSpectrumPlot for a pandas DataFrame. Plots a given power spectrum with units in the form Unit Name (unit type), i.e. Photocurrent (mA).
-
-    :param power_spectrum: The power spectrum to be plotted, with frequency bins on one column and power in the second column
-    """
-
-    fig, ax = plt.subplots()
-    frequency_label = power_spectrum.columns.values[0]
-    power_label = power_spectrum.columns.values[1]
-    power_quantity = title_to_quantity(power_label)
-    standard_quantity = to_standard_quantity(power_quantity)
-    base_units = np.sqrt(standard_quantity).units
-
-    ax.plot(
-        power_spectrum[frequency_label].values,
-        10*np.log10(standard_quantity.magnitude * \
-        power_spectrum[power_label].values))
-    ax.set_ylabel('dB{:~}'.format(base_units))
-    ax.set_xlabel(frequency_label)
-    prettifyPlot(ax=ax, fig=fig)
-    return fig, ax
-
