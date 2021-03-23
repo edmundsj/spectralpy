@@ -5,7 +5,7 @@ from numpy.testing import assert_equal, assert_allclose
 from spectralpy import sampling_period, title_to_quantity, to_standard_quantity, frequency_bin_size, quantity_to_title
 from pint import UnitRegistry
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def ureg():
     return UnitRegistry()
 
@@ -27,6 +27,12 @@ def test_quantity_to_title(ureg):
     actual_title = quantity_to_title(quantity)
     assert_equal(actual_title, desired_title)
 
+def test_quantity_to_title_with_name(ureg):
+    quantity = ureg.mV * 1.0
+    desired_name = 'photovoltage'
+    desired_title = 'photovoltage (mV)'
+    actual_title = quantity_to_title(quantity, desired_name)
+    assert_equal(actual_title, desired_title)
 
 def testExtractTimeUnits(ureg):
     unit_string = 'Time (s)'

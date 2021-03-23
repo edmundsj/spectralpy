@@ -48,11 +48,11 @@ def title_to_quantity(quantity_string):
     quantity = 1 * ureg.parse_expression(bare_unit_string)
     return quantity
 
-def quantity_to_title(quantity):
+def quantity_to_title(quantity, name=None):
     """
     Converts a quantity into a standard title
     """
-    title_mapping = {
+    standard_mapping = {
         ureg.V: 'Voltage',
         ureg.A: 'Current',
         ureg.ohm: 'Impedance',
@@ -60,10 +60,19 @@ def quantity_to_title(quantity):
         ureg.A**2: 'Power',
         ureg.ohm**2: 'Power',
         ureg.Hz: 'Frequency',
+        ureg.m: 'Wavelength',
         ureg.s: 'Time',
+        ureg.degK: 'Temperature',
+        ureg.degC: 'Temperature',
+        ureg.degF: 'Temperature',
     }
-    standard_unit = to_standard_quantity(quantity).units
-    title = title_mapping[standard_unit] + ' ({:~})'.format(quantity.units)
+    if not name:
+        standard_unit = to_standard_quantity(quantity).units
+        title_prefix = standard_mapping[standard_unit]
+    else:
+        title_prefix = name
+
+    title = title_prefix + ' ({:~})'.format(quantity.units)
     return title
 
 def to_standard_quantity(quantity):
