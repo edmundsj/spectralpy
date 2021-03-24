@@ -1,2 +1,3 @@
-from spectralpy.source.unit_parsing import *
+import pint
+ureg = pint.get_application_registry()
 from spectralpy.source.spectral_processing import *

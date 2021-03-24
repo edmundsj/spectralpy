@@ -147,7 +147,7 @@ def testPandasBoxcar():
     actual_spectrum = \
         power_spectrum(input_data, window='box', siding='single')
     desired_spectrum = pd.DataFrame({
-        'Frequency (Hz)': np.array([0, 1/6, 1/3, 1/2]),
-        'Power (V ** 2)': 1e-12*np.array([6.25, 2*1, 2*1/3.0, 2*1/4.0])})
+        'frequency (Hz)': np.array([0, 1/6, 1/3, 1/2]),
+        'power (V ** 2)': 1e-12*np.array([6.25, 2*1, 2*1/3.0, 2*1/4.0])})
     assert_frame_equal(actual_spectrum, desired_spectrum, atol=1e-17, rtol=1e-16)
 

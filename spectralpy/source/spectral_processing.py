@@ -5,12 +5,11 @@ import numpy as np
 import pandas as pd
 from scipy.signal.windows import hann
 from sugarplot import plt, prettifyPlot
-from spectralpy import sampling_period, title_to_quantity, to_standard_quantity, quantity_to_title
-from pint import UnitRegistry
+from sciparse import sampling_period, title_to_quantity, to_standard_quantity, quantity_to_title
 import re
-ureg = UnitRegistry()
+from spectralpy import ureg
 
-def power_spectrum(data, window='box', siding='single'):
+def power_spectrum(data, window='box', siding='single', ureg=ureg):
     """
     Computes the single-or double-sided power spectrum with different types
     of filetring (hann, boxcar)
@@ -44,7 +43,7 @@ def power_spectrum(data, window='box', siding='single'):
 
     return power_spectrum
 
-def power_spectrum_pandas(data, window_data=1, siding='single'):
+def power_spectrum_pandas(data, window_data=1, siding='single', ureg=ureg):
     """
     Implementation of powerSpectrum for a pandas DataFrame.
 
