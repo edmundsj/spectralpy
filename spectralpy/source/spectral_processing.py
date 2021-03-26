@@ -4,7 +4,6 @@ TODO: Add power spectrum plotting for pandas as well as numpy, separate out the 
 import numpy as np
 import pandas as pd
 from scipy.signal.windows import hann
-from sugarplot import plt, prettifyPlot
 from sciparse import sampling_period, title_to_quantity, to_standard_quantity, quantity_to_title
 import re
 from spectralpy import ureg
