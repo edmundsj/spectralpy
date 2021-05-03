@@ -2,8 +2,9 @@ import pytest
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_equal, assert_allclose
+from sciparse import assert_allclose_qt, assert_equal_qt
 from pandas.testing import assert_frame_equal
-from spectralpy import power_spectrum
+from spectralpy import power_spectrum, hann_norm, generate_window, psd_weights, ureg, dirichlet, extract_power, hann_dtft
 
 def testPowerSpectrumBoxcar():
     """
@@ -13,7 +14,7 @@ def testPowerSpectrumBoxcar():
     raw_data = np.array([1, 2, 3, 4, 5, 0])
     actual_spectrum = \
             power_spectrum(raw_data, window='box', siding='single')
-    desired_spectrum = np.array([6.25, 2*1, 2*1/3.0, 2*1/4.0])
+    desired_spectrum = np.array([6.25, 2*1, 2*1/3.0, 1/4.0])
     assert_allclose(actual_spectrum, desired_spectrum)
 
     # Odd number of samples
@@ -140,14 +141,29 @@ def testPandasBoxcar():
     raw_data = np.array([1, 2, 3, 4, 5, 0])
     times = np.array([1, 2, 3, 4, 5, 6])
     desired_frequencies = np.array([0, 1/6, 1/3,1/2])
+    desired_powers = 1e-12*np.array([6.25, 2*1, 2*1/3.0, 2*1/4.0])
     desired_unit = 'Hz'
     input_data = pd.DataFrame({
         'Time (s)': times,
         'Amplitude (uV)': raw_data})
     actual_spectrum = \
-        power_spectrum(input_data, window='box', siding='single')
+        power_spectrum(input_data, window='box', siding='single', amplitude=False)
     desired_spectrum = pd.DataFrame({
-        'frequency (Hz)': np.array([0, 1/6, 1/3, 1/2]),
-        'power (V ** 2)': 1e-12*np.array([6.25, 2*1, 2*1/3.0, 2*1/4.0])})
-    assert_frame_equal(actual_spectrum, desired_spectrum, atol=1e-17, rtol=1e-16)
+        'frequency (Hz)': desired_frequencies,
+        'power (V ** 2)': desired_powers})
+    assert_frame_equal(actual_spectrum, desired_spectrum, atol=1e-10, rtol=1e-16)
 
+def test_amplitude_spectrum_double():
+    raw_data = np.array([1, 2, 3, 4, 5, 0])
+    times = np.array([1, 2, 3, 4, 5, 6])
+    desired_frequencies = np.array([0, 1/6, 2/6, 3/6, 4/6, 5/6], dtype=np.float64)
+    desired_amplitudes = 1e-6 * np.array([2.5, -1, -0.57735j, 0.5,0.57735j, -1.], dtype=np.complex128)
+    input_data = pd.DataFrame({
+        'Time (s)': times,
+        'Amplitude (uV)': raw_data})
+    actual_spectrum = \
+        power_spectrum(input_data, window='box', siding='double', amplitude=True)
+    desired_spectrum = pd.DataFrame({
+        'frequency (Hz)': desired_frequencies,
+        'voltage (V)': desired_amplitudes})
+    assert_frame_equal(actual_spectrum, desired_spectrum, atol=1e-8, rtol=1e-8)
