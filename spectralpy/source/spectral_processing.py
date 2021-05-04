@@ -83,16 +83,16 @@ def power_spectrum_pandas(data, window_data=1, siding='single',
     :param amplitude: Whether to return the power spectrum or the amplitude spectrum
     :param siding: single or double (sinusoidal or exponential)
     """
+    n_samples = len(data)
+    half_data_length = int(n_samples/2+1)
     Ts = sampling_period(data)
-    sampling_frequency = (1 / Ts).to(ureg.Hz)
-    sampling_frequency_Hz = (1 / Ts).to(ureg.Hz).magnitude
+    fs = (1 / Ts).to(ureg.Hz)
+    fs_Hz = fs.to(ureg.Hz).magnitude
 
     power_quantity = title_to_quantity(data.columns.values[1])
 
-    n_samples = len(data)
-    half_data_length = int(n_samples/2+1)
     frequencies = np.linspace(0,
-            sampling_frequency_Hz * (n_samples - 1) / (n_samples),
+            fs_Hz* (n_samples - 1) / (n_samples),
             n_samples)
 
     if amplitude == False:
@@ -100,7 +100,7 @@ def power_spectrum_pandas(data, window_data=1, siding='single',
 
     power_quantity = to_standard_quantity(power_quantity)
     power_title = quantity_to_title(power_quantity)
-    frequency_title = quantity_to_title(sampling_frequency)
+    frequency_title = quantity_to_title(fs)
 
     if siding == 'single':
         frequencies = double_to_single(frequencies, freq=True)
@@ -116,7 +116,8 @@ def power_spectrum_pandas(data, window_data=1, siding='single',
         {frequency_title: frequencies, power_title: fft_data})
     return overall_data
 
-def power_spectrumNumpy(data, window_data, siding='single', amplitude=False):
+def power_spectrumNumpy(data, window_data=1, siding='single',
+        amplitude=False):
     """
     Implementation of powerSpectrum for numpy arrays.
 
@@ -168,8 +169,7 @@ def psd_weights(data, frequency, window='hann', siding='single', amplitude=False
     ts = sampling_period(data)
     W0 = 2*np.pi * frequency * ts
     if isinstance(W0, pint.Quantity):
-        if W0.dimensionless == True:
-            W0 = W0.m
+        W0 = W0.to(ureg.rad).m
     W_max = 2*np.pi * (n_samples - 1) / n_samples
     W_min = 0
     W = np.linspace(W_min, W_max, n_samples)
@@ -193,6 +193,7 @@ def psd_weights(data, frequency, window='hann', siding='single', amplitude=False
 def extract_power(data, frequency, window='hann', siding='double'):
     """
     Extracts the power of a desired frequency from a power spectral density, accounting for spectral leakage and frequency bin size
+    TODO: NEEDS TO FIT OR KNOW THE PHASE OF THE SINEWAVE OF INTEREST. RIGHT NOW IT FAILS WHEN THE SIGNAL IS NOT A PERFECT COSINE.
 
     :param data: Time-domain data
     :param frequency: Desired frequency power to extract
@@ -202,13 +203,13 @@ def extract_power(data, frequency, window='hann', siding='double'):
     ts = sampling_period(data)
     n_samples = len(data)
     spectrum = power_spectrum(data, window=window, siding=siding, amplitude=True)
+    power_quantity = title_to_quantity(spectrum.columns.values[1]) ** 2
     known_spectrum = psd_weights(data, frequency, window=window, siding=siding, amplitude=True)
     if isinstance(spectrum, pd.DataFrame):
-        spectrum = spectrum.iloc[:, 1].values
-    spectrum_product = np.conj(spectrum) * known_spectrum
+        spectrum_product = np.abs(spectrum.iloc[:,1].values) * np.abs(known_spectrum)
+    elif isinstance(spectrum, np.ndarray):
+        spectrum_product = np.abs(spectrum) * np.abs(known_spectrum)
      # Take only the real part. Not sure how kosher this is.
-    spectrum_integral = np.real(np.sum(spectrum_product))
-
-    power_quantity = title_to_quantity(data.columns.values[1]) ** 2
+    spectrum_integral = np.square(np.real(np.sum(spectrum_product)))
 
     return spectrum_integral * power_quantity

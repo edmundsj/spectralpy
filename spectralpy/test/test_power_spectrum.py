@@ -6,6 +6,16 @@ from sciparse import assert_allclose_qt, assert_equal_qt
 from pandas.testing import assert_frame_equal
 from spectralpy import power_spectrum, hann_norm, generate_window, psd_weights, ureg, dirichlet, extract_power, hann_dtft
 
+def test_generate_window_boxcar():
+    desired_window = np.ones(5)
+    actual_window = generate_window(n_samples=5, window='boxcar')
+    assert_equal(actual_window, desired_window)
+
+def test_generate_window_hann():
+    desired_window = np.array([0, 0.5, 1, 0.5, 0]) / 0.5477225575051661
+    actual_window = generate_window(n_samples=5, window='hann')
+    assert_equal(actual_window, desired_window)
+
 def testPowerSpectrumBoxcar():
     """
     Tests calculation of the power spectrum with a boxcar window
@@ -133,7 +143,7 @@ def testDCHann():
     actual_dc_component = actual_spectrum[0]
     assert_equal(actual_dc_component, desired_dc_component)
 
-def testPandasBoxcar():
+def test_pandas_boxcar():
     """
     Tests whether pandas gives the correct sampling frequency,
     frequency spacing, and spectral data.
@@ -153,11 +163,53 @@ def testPandasBoxcar():
         'power (V ** 2)': desired_powers})
     assert_frame_equal(actual_spectrum, desired_spectrum, atol=1e-10, rtol=1e-16)
 
+def test_pandas_boxcar():
+    """
+    Tests whether pandas gives the correct sampling frequency,
+    frequency spacing, and spectral data.
+    """
+    raw_data = np.array([1, 2, 3, 4, 5, 0])
+    times = np.array([1, 2, 3, 4, 5, 6])
+    desired_frequencies = np.array([0, 1/6, 1/3,1/2])
+    desired_powers = 1e-12*np.array([6.25, 2*1, 2*1/3.0, 1/4.0])
+    desired_unit = 'Hz'
+    input_data = pd.DataFrame({
+        'Time (s)': times,
+        'Amplitude (uV)': raw_data})
+    actual_spectrum = \
+        power_spectrum(input_data, window='box', siding='single', amplitude=False)
+    desired_spectrum = pd.DataFrame({
+        'frequency (Hz)': desired_frequencies,
+        'power (V ** 2)': desired_powers})
+    assert_frame_equal(actual_spectrum, desired_spectrum,
+            atol=1e-15, rtol=1e-16)
+
+def test_pandas_hann():
+    """
+    Tests whether pandas gives the correct sampling frequency,
+    frequency spacing, and spectral data.
+    """
+    raw_data = np.array([1, 2, 3, 4, 5, 0])
+    times = np.array([1, 2, 3, 4, 5, 6])
+    desired_frequencies = np.array([0, 1/6, 1/3,1/2])
+    desired_powers = np.array([6.805555555555554e-12, 5.739163982499836e-12, 2.0837646694465478e-13, 1.5480025000233596e-15])
+    desired_unit = 'Hz'
+    input_data = pd.DataFrame({
+        'Time (s)': times,
+        'Amplitude (uV)': raw_data})
+    actual_spectrum = \
+        power_spectrum(input_data, window='hann', siding='single', amplitude=False)
+    desired_spectrum = pd.DataFrame({
+        'frequency (Hz)': desired_frequencies,
+        'power (V ** 2)': desired_powers})
+    assert_frame_equal(actual_spectrum, desired_spectrum,
+            atol=1e-15, rtol=1e-16)
+
 def test_amplitude_spectrum_double():
     raw_data = np.array([1, 2, 3, 4, 5, 0])
     times = np.array([1, 2, 3, 4, 5, 6])
     desired_frequencies = np.array([0, 1/6, 2/6, 3/6, 4/6, 5/6], dtype=np.float64)
-    desired_amplitudes = 1e-6 * np.array([2.5, -1, -0.57735j, 0.5,0.57735j, -1.], dtype=np.complex128)
+    desired_amplitudes = np.array([(2.4999999999999998e-06+0j), (-1e-06+0j), (-1.1102230246251565e-22-5.773502691896258e-07j), (4.999999999999999e-07+0j), (-1.1102230246251565e-22+5.773502691896258e-07j), (-9.999999999999997e-07+0j)])
     input_data = pd.DataFrame({
         'Time (s)': times,
         'Amplitude (uV)': raw_data})

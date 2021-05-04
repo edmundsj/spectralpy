@@ -1,10 +1,20 @@
 import pytest
+import os
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_equal, assert_allclose
 from sciparse import assert_allclose_qt, assert_equal_qt
 from pandas.testing import assert_frame_equal
 from spectralpy import power_spectrum, hann_norm, generate_window, psd_weights, ureg, dirichlet, extract_power, hann_dtft
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+
+@pytest.fixture
+def real_data():
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    data = pd.read_csv(dir_path + '/data/NL_test_data_10k.csv')
+    real_equation = 'sin(x) * 1e-3 * cos(2x) + 1e-6 * sin(3x)'
+    yield data
 
 def test_hann_norm():
     n_samples = 5
@@ -135,6 +145,55 @@ def test_extract_power_double_sided_no_leak():
     actual_power = extract_power(data, frequency, siding='double', window='boxcar')
     assert_allclose_qt(actual_power, desired_power)
 
+def test_extract_power_double_sided_sinewave():
+    """
+    """
+    data = pd.DataFrame({
+            'Time (s)': [0, 1, 2, 3],
+            'Value (A)': [0, 1, 0, -1]})
+    desired_power = 0.5*ureg.A ** 2
+    frequency = 0.25 * ureg.Hz
+    actual_power = extract_power(data, frequency, siding='double', window='boxcar')
+    assert_allclose_qt(actual_power, desired_power)
+
+
+def test_extract_power_double_sided_no_leak_doubled():
+    """
+    """
+    data = pd.DataFrame({
+            'Time (s)': [0, 1, 2, 3],
+            'Value (A)': [2, -2, 2, -2]})
+    desired_power = 4*ureg.A ** 2
+    frequency = 0.5 * ureg.Hz
+    actual_power = extract_power(data, frequency, siding='double', window='boxcar')
+    assert_allclose_qt(actual_power, desired_power)
+
+def test_extract_power_double_sided_no_leak():
+    """
+    """
+    data = pd.DataFrame({
+            'Time (s)': [0, 1, 2, 3],
+            'Value (A)': [1, -1, 1, -1]})
+    desired_power = 1*ureg.A ** 2
+    frequency = 0.5 * ureg.Hz
+    actual_power = extract_power(data, frequency, siding='double', window='boxcar')
+    assert_allclose_qt(actual_power, desired_power)
+
+    frequency = 0.5 * ureg.Hz
+    actual_power = extract_power(data, frequency, siding='double', window='boxcar')
+    assert_allclose_qt(actual_power, desired_power)
+
+def test_extract_power_double_sided_no_leak_diff_units():
+    """
+    """
+    data = pd.DataFrame({
+            'Time (ms)': [0, 1, 2, 3],
+            'Value (A)': [1, -1, 1, -1]})
+    desired_power = 1*ureg.A ** 2
+    frequency = 0.5 * ureg.kHz
+    actual_power = extract_power(data, frequency, siding='double', window='boxcar')
+    assert_allclose_qt(actual_power, desired_power)
+
 def test_extract_power_double_sided_with_leak():
     """
     """
@@ -156,3 +215,27 @@ def test_extract_power_double_sided_with_leak_hann():
     frequency = 0.5 * ureg.Hz
     actual_power = extract_power(data, frequency, siding='double', window='hann')
     assert_allclose_qt(actual_power, desired_power)
+
+def test_extract_power_noiseless_data_first_harmonic(real_data):
+    """
+    """
+    desired_power = 5e-19 * (ureg.A ** 2)
+    frequency = 100 * ureg.Hz
+    actual_power = extract_power(real_data, frequency, siding='double', window='hann')
+    assert_allclose_qt(actual_power, desired_power, atol=1e-30, rtol=1e-5)
+
+def test_extract_power_noiseless_data_second_harmonic(real_data):
+    """
+    """
+    desired_power = 5e-19 * 1e-6 * (ureg.A ** 2)
+    frequency = 2 * 100 * ureg.Hz
+    actual_power = extract_power(real_data, frequency, siding='double', window='hann')
+    assert_allclose_qt(actual_power, desired_power, atol=1e-28, rtol=1e-4)
+
+def test_extract_power_noiseless_data_third_harmonic(real_data):
+    """
+    """
+    desired_power = 5e-19 * 1e-12 * (ureg.A ** 2)
+    frequency = 3 * 100 * ureg.Hz
+    actual_power = extract_power(real_data, frequency, siding='double', window='hann')
+    assert_allclose_qt(actual_power, desired_power, atol=1e-32, rtol=1e-3)
