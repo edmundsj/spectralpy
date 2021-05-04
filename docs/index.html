@@ -161,8 +161,48 @@ multiple bins near zero (~approx 3).</p>
 <p>component (mean)</p>
 <span class="target" id="module-spectral_processing"></span><p>TODO: Add power spectrum plotting for pandas as well as numpy, separate out the two.</p>
 <dl class="py function">
+<dt id="spectral_processing.double_to_single">
+<code class="sig-prename descclassname">spectral_processing.</code><code class="sig-name descname">double_to_single</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spectrum</span></em>, <em class="sig-param"><span class="n">freq</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spectral_processing.double_to_single" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a single-sided spectrum into a double-sided spectrum</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spectrum</strong> – Spectrum to convert from double sided to single-sided.</p></li>
+<li><p><strong>freq</strong> – If the data is stand-alone frequency data that should not be power-corrected</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spectral_processing.extract_power">
+<code class="sig-prename descclassname">spectral_processing.</code><code class="sig-name descname">extract_power</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">frequency</span></em>, <em class="sig-param"><span class="n">window</span><span class="o">=</span><span class="default_value">'hann'</span></em>, <em class="sig-param"><span class="n">siding</span><span class="o">=</span><span class="default_value">'double'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spectral_processing.extract_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts the power of a desired frequency from a power spectral density, accounting for spectral leakage and frequency bin size</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Time-domain data</p></li>
+<li><p><strong>frequency</strong> – Desired frequency power to extract</p></li>
+<li><p><strong>window</strong> – Window type. Options are “hann” or “boxcar”</p></li>
+<li><p><strong>siding</strong> – Whether the input spectrum is single-sided or double-sided</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spectral_processing.generate_window">
+<code class="sig-prename descclassname">spectral_processing.</code><code class="sig-name descname">generate_window</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_samples</span></em>, <em class="sig-param"><span class="n">window</span><span class="o">=</span><span class="default_value">'hann'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spectral_processing.generate_window" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="spectral_processing.hann_norm">
+<code class="sig-prename descclassname">spectral_processing.</code><code class="sig-name descname">hann_norm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_samples</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spectral_processing.hann_norm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="spectral_processing.power_spectrum">
-<code class="sig-prename descclassname">spectral_processing.</code><code class="sig-name descname">power_spectrum</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">window='box'</em>, <em class="sig-param">siding='single'</em>, <em class="sig-param">ureg=&lt;pint.registry.UnitRegistry object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#spectral_processing.power_spectrum" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">spectral_processing.</code><code class="sig-name descname">power_spectrum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">window</span><span class="o">=</span><span class="default_value">'hann'</span></em>, <em class="sig-param"><span class="n">siding</span><span class="o">=</span><span class="default_value">'single'</span></em>, <em class="sig-param"><span class="n">amplitude</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spectral_processing.power_spectrum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the single-or double-sided power spectrum with different types
 of filetring (hann, boxcar)</p>
 <dl class="field-list simple">
@@ -170,6 +210,7 @@ of filetring (hann, boxcar)</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – data to be transformed</p></li>
 <li><p><strong>window</strong> – window type - hann or box</p></li>
+<li><p><strong>amplitude</strong> – Whether to return the power spectrum or the amplitude spectrum</p></li>
 <li><p><strong>siding</strong> – ‘single’ or ‘double’ sided spectrum.</p></li>
 </ul>
 </dd>
@@ -178,7 +219,7 @@ of filetring (hann, boxcar)</p>
 
 <dl class="py function">
 <dt id="spectral_processing.power_spectrumNumpy">
-<code class="sig-prename descclassname">spectral_processing.</code><code class="sig-name descname">power_spectrumNumpy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">window_data</span></em>, <em class="sig-param"><span class="n">siding</span><span class="o">=</span><span class="default_value">'single'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spectral_processing.power_spectrumNumpy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">spectral_processing.</code><code class="sig-name descname">power_spectrumNumpy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">window_data</span></em>, <em class="sig-param"><span class="n">siding</span><span class="o">=</span><span class="default_value">'single'</span></em>, <em class="sig-param"><span class="n">amplitude</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spectral_processing.power_spectrumNumpy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implementation of powerSpectrum for numpy arrays.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -186,6 +227,7 @@ of filetring (hann, boxcar)</p>
 <li><p><strong>data</strong> – Input data (numpy array)</p></li>
 <li><p><strong>window_data</strong> – Raw window data to multiply the data by</p></li>
 <li><p><strong>siding</strong> – single or double (sinusoidal or complex)</p></li>
+<li><p><strong>amplitude</strong> – Whether to return the power spectrum or the amplitude spectrum</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns power_spectrum</dt>
@@ -196,13 +238,30 @@ of filetring (hann, boxcar)</p>
 
 <dl class="py function">
 <dt id="spectral_processing.power_spectrum_pandas">
-<code class="sig-prename descclassname">spectral_processing.</code><code class="sig-name descname">power_spectrum_pandas</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">window_data=1</em>, <em class="sig-param">siding='single'</em>, <em class="sig-param">ureg=&lt;pint.registry.UnitRegistry object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#spectral_processing.power_spectrum_pandas" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">spectral_processing.</code><code class="sig-name descname">power_spectrum_pandas</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">window_data</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">siding</span><span class="o">=</span><span class="default_value">'single'</span></em>, <em class="sig-param"><span class="n">amplitude</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spectral_processing.power_spectrum_pandas" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implementation of powerSpectrum for a pandas DataFrame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>window_data</strong> – Raw window data to multiply the time-domain data by</p></li>
+<li><p><strong>amplitude</strong> – Whether to return the power spectrum or the amplitude spectrum</p></li>
 <li><p><strong>siding</strong> – single or double (sinusoidal or exponential)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="spectral_processing.psd_weights">
+<code class="sig-prename descclassname">spectral_processing.</code><code class="sig-name descname">psd_weights</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">frequency</span></em>, <em class="sig-param"><span class="n">window</span><span class="o">=</span><span class="default_value">'hann'</span></em>, <em class="sig-param"><span class="n">siding</span><span class="o">=</span><span class="default_value">'single'</span></em>, <em class="sig-param"><span class="n">amplitude</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#spectral_processing.psd_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the PSD weights for an ideal sinewave of a given frequency</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frequency</strong> – Desired frequency to extract</p></li>
+<li><p><strong>data</strong> – Time-domain data we want the frequency-domain weights of</p></li>
+<li><p><strong>window</strong> – Window type. Options are “hann” or “boxcar”</p></li>
+<li><p><strong>power</strong> – Whether to give magnitude squared (if true) or amplitude (if false)</p></li>
 </ul>
 </dd>
 </dl>
